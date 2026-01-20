@@ -33,32 +33,16 @@ class ItemController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id): JsonResponse
+    public function show(Item $item): JsonResponse
     {
-        $item = Item::find($id);
-
-        if (!$item) {
-            return response()->json([
-                'message' => 'Item not found'
-            ], Response::HTTP_NOT_FOUND);
-        }
-
         return response()->json($item, Response::HTTP_OK);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateItemRequest $request, string $id): JsonResponse
+    public function update(UpdateItemRequest $request, Item $item): JsonResponse
     {
-        $item = Item::find($id);
-
-        if (!$item) {
-            return response()->json([
-                'message' => 'Item not found'
-            ], Response::HTTP_NOT_FOUND);
-        }
-
         $item->update($request->validated());
 
         return response()->json($item, Response::HTTP_OK);
@@ -67,16 +51,8 @@ class ItemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id): Response|JsonResponse
+    public function destroy(Item $item): Response
     {
-        $item = Item::find($id);
-
-        if (!$item) {
-            return response()->json([
-                'message' => 'Item not found'
-            ], Response::HTTP_NOT_FOUND);
-        }
-
         $item->delete();
 
         return response()->noContent();
