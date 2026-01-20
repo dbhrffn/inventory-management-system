@@ -70,9 +70,21 @@ export const deleteItem = async (id) => {
 };
 
 /**
+ * Custom error class for API errors with status code
+ */
+class ApiError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.isNotFound = status === 404;
+  }
+}
+
+/**
  * Handle axios errors and extract meaningful error messages
  * @param {Error} error - Axios error object
- * @returns {Error} Formatted error with message
+ * @returns {ApiError} Formatted error with message and status
  */
 const handleError = (error) => {
   if (error.response) {
@@ -80,31 +92,40 @@ const handleError = (error) => {
     const status = error.response.status;
     const data = error.response.data;
 
-    if (data && data.message) {
-      return new Error(data.message);
-    }
+    let message = '';
 
-    if (data && data.errors) {
+    if (data && data.message) {
+      message = data.message;
+    } else if (data && data.errors) {
       // Validation errors from Laravel
       const firstError = Object.values(data.errors)[0];
-      return new Error(Array.isArray(firstError) ? firstError[0] : firstError);
+      message = Array.isArray(firstError) ? firstError[0] : firstError;
+    } else {
+      // Default messages based on status
+      switch (status) {
+        case 404:
+          message = 'Item not found';
+          break;
+        case 422:
+          message = 'Validation failed. Please check your input.';
+          break;
+        case 500:
+          message = 'Server error. Please try again later.';
+          break;
+        default:
+          message = `Request failed with status ${status}`;
+      }
     }
 
-    switch (status) {
-      case 404:
-        return new Error('Item not found');
-      case 422:
-        return new Error('Validation failed. Please check your input.');
-      case 500:
-        return new Error('Server error. Please try again later.');
-      default:
-        return new Error(`Request failed with status ${status}`);
-    }
+    return new ApiError(message, status);
   } else if (error.request) {
     // Request was made but no response received
-    return new Error('Network error. Please check your connection.');
+    return new ApiError('Network error. Please check your connection.', null);
   } else {
     // Something else happened
-    return new Error(error.message || 'An unexpected error occurred');
+    return new ApiError(error.message || 'An unexpected error occurred', null);
   }
 };
+
+// Export ApiError for use in components
+export { ApiError };
