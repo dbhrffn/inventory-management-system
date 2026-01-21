@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout.jsx';
-import InventoryList from './components/InventoryList.jsx';
-import ItemFormPage from './components/ItemFormPage.jsx';
-import NotFound from './components/NotFound.jsx';
+import Layout from './components/shared/Layout.jsx';
+import ItemFormPage from './components/inventory/forms/ItemFormPage.jsx';
+import InventoryList from './components/inventory/index/InventoryList.jsx';
+import NotFound from './components/shared/pages/NotFound.jsx';
 
 function App() {
   return (

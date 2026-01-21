@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createItem, updateItem, getItem, ApiError } from '../services/itemService.js';
+import { createItem, updateItem, getItem, ApiError } from '../../../services/itemService.js';
 import ItemForm from './ItemForm.jsx';
 
 export default function ItemFormPage() {

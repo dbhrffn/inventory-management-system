@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { getAllItems, deleteItem } from '../services/itemService.js';
+import { getAllItems, deleteItem } from '../../../services/itemService.js';
+import DeleteModal from '../../shared/modals/DeleteModal.jsx';
+import { formatDate } from '../../../utils/dateFormatter.js';
 
 export default function InventoryList() {
   const location = useLocation();
@@ -9,6 +11,8 @@ export default function InventoryList() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(location.state?.message || null);
   const [deleteLoading, setDeleteLoading] = useState({});
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     fetchItems();
@@ -37,21 +41,34 @@ export default function InventoryList() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) {
-      return;
-    }
+  const handleDelete = (item) => {
+    setItemToDelete(item);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
 
     try {
-      setDeleteLoading((prev) => ({ ...prev, [id]: true }));
+      setDeleteLoading((prev) => ({ ...prev, [itemToDelete.id]: true }));
       setError(null);
-      await deleteItem(id);
+      await deleteItem(itemToDelete.id);
       setSuccessMessage('Item deleted successfully!');
       await fetchItems();
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
     } catch (err) {
       setError(err.message || 'Failed to delete item');
+      setDeleteModalOpen(false);
     } finally {
-      setDeleteLoading((prev) => ({ ...prev, [id]: false }));
+      setDeleteLoading((prev) => ({ ...prev, [itemToDelete.id]: false }));
+    }
+  };
+
+  const closeDeleteModal = () => {
+    if (!deleteLoading[itemToDelete?.id]) {
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
     }
   };
 
@@ -155,7 +172,7 @@ export default function InventoryList() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(item.created_at).toLocaleDateString()}
+                      {formatDate(item.created_at)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
@@ -167,7 +184,7 @@ export default function InventoryList() {
                           Edit
                         </Link>
                         <button
-                          onClick={() => handleDelete(item.id)}
+                          onClick={() => handleDelete(item)}
                           disabled={deleteLoading[item.id]}
                           className="text-red-600 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-2 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Delete"
@@ -183,6 +200,16 @@ export default function InventoryList() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={deleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        title="Delete Item"
+        message={`Are you sure you want to delete "${itemToDelete?.name}"? This action cannot be undone.`}
+        isLoading={deleteLoading[itemToDelete?.id]}
+      />
     </div>
   );
 }
