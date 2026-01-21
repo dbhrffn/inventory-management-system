@@ -4,7 +4,7 @@ A modern web application for managing inventory items, built with Laravel and Re
 
 ## About
 
-This Inventory Management System provides a comprehensive solution for tracking and managing inventory items. The application features a RESTful API backend powered by Laravel and a modern React frontend with Tailwind CSS for styling.
+This Inventory Management System provides a comprehensive solution for tracking and managing inventory items. The application features a RESTful API backend powered by Laravel and a modern React frontend with Material UI (MUI) for a professional, component-based user interface.
 
 ### Features
 
@@ -13,11 +13,12 @@ This Inventory Management System provides a comprehensive solution for tracking 
 - **RESTful API**: Clean and intuitive API endpoints for all operations
 - **Input Validation**: Comprehensive request validation for data integrity
 - **Error Handling**: Automatic ID validation with proper 404 responses for invalid or non-existent items
-- **Modern UI**: React-based frontend with Tailwind CSS
+- **Modern UI**: React-based frontend with Material UI (MUI)
+- **Professional UI Kit**: Material UI components for a polished, enterprise-grade interface
 - **Client-side Routing**: React Router for seamless navigation
-- **Modal Confirmations**: User-friendly delete confirmation modals
+- **Modal Confirmations**: MUI Dialog-based delete confirmation modals
 - **Date Formatting**: Consistent date display with date-fns
-- **Responsive Design**: Mobile-friendly interface
+- **Responsive Design**: Mobile-friendly interface with MUI's responsive components
 - **Real-time Updates**: Fast and responsive user interface
 
 ## Tech Stack
@@ -32,7 +33,9 @@ This Inventory Management System provides a comprehensive solution for tracking 
 ### Frontend
 - **React 19**: UI library
 - **React Router 7**: Client-side routing and navigation
-- **Tailwind CSS 4**: Utility-first CSS framework
+- **Material UI (MUI) 6**: Professional React component library
+- **Emotion**: CSS-in-JS styling (MUI dependency)
+- **MUI Icons**: Comprehensive icon set
 - **date-fns**: Modern date formatting and manipulation
 - **Vite 7**: Build tool and development server
 - **Axios**: HTTP client for API requests
@@ -287,6 +290,39 @@ The application uses React Router for client-side navigation:
 - **Delete Confirmation**: Modal dialog with item details
 - **Form Validation**: Client-side and server-side validation
 - **Keyboard Navigation**: ESC key to close modals
+
+### Material UI Integration
+
+The application uses Material UI (MUI) as a professional UI component library, demonstrating:
+
+**Core Components Used:**
+- `AppBar` & `Toolbar` - Navigation header with branded styling
+- `Table`, `TableContainer`, `TableHead`, `TableBody` - Professional data tables
+- `TextField` - Form inputs with built-in validation states
+- `Button` & `IconButton` - Consistent action buttons with icons
+- `Dialog` - Modal confirmations with proper accessibility
+- `Alert` - Success/error notifications with auto-dismiss
+- `Paper` - Elevated surfaces for content sections
+- `Chip` - Badge-style quantity indicators
+- `CircularProgress` - Loading spinners
+- `Stack` & `Box` - Layout components for spacing and alignment
+
+**MUI Icons:**
+- `Inventory`, `Add`, `Edit`, `Delete` - Action icons
+- `Save`, `Cancel` - Form actions
+- `Warning`, `Home`, `ArrowBack`, `SentimentDissatisfied` - Status and navigation
+
+**Theme Customization:**
+- Custom color palette (primary blue #2563eb, secondary red #dc2626)
+- Typography configuration with system font stack
+- Consistent spacing and elevation throughout the app
+
+**Benefits:**
+- Professional, polished UI out of the box
+- Accessibility features built-in (ARIA attributes, keyboard navigation)
+- Responsive components that adapt to all screen sizes
+- Consistent design language across all pages
+- Easy maintenance and extensibility
 
 ## Database Schema
 

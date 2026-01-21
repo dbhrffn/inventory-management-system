@@ -1,5 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { Box, Typography, Button, Stack } from '@mui/material';
+import { SentimentDissatisfied as SadIcon, Home as HomeIcon, ArrowBack as BackIcon } from '@mui/icons-material';
 
 export default function NotFound({ message = 'Page not found', autoRedirect = false, redirectDelay = 3000 }) {
   const navigate = useNavigate();
@@ -14,46 +16,42 @@ export default function NotFound({ message = 'Page not found', autoRedirect = fa
   }, [autoRedirect, redirectDelay, navigate]);
 
   return (
-    <div className="max-w-2xl mx-auto text-center py-12">
-      <div className="mb-8">
-        <svg
-          className="mx-auto h-24 w-24 text-gray-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </div>
+    <Box sx={{ maxWidth: 800, mx: 'auto', textAlign: 'center', py: 12 }}>
+      <Box sx={{ mb: 6 }}>
+        <SadIcon sx={{ fontSize: 96, color: 'text.disabled' }} />
+      </Box>
 
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-      <h2 className="text-2xl font-semibold text-gray-700 mb-4">{message}</h2>
-      <p className="text-gray-600 mb-8">
+      <Typography variant="h1" component="h1" gutterBottom sx={{ fontSize: '4rem', fontWeight: 'bold' }}>
+        404
+      </Typography>
+      <Typography variant="h5" component="h2" gutterBottom fontWeight="semibold" color="text.primary">
+        {message}
+      </Typography>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 6 }}>
         {autoRedirect
           ? `Redirecting you back to the inventory list in ${redirectDelay / 1000} seconds...`
           : 'The item you are looking for does not exist or may have been deleted.'}
-      </p>
+      </Typography>
 
-      <div className="flex justify-center space-x-4">
-        <Link
+      <Stack direction="row" spacing={2} justifyContent="center">
+        <Button
+          component={Link}
           to="/"
-          className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
+          variant="contained"
+          size="large"
+          startIcon={<HomeIcon />}
         >
           Go to Inventory List
-        </Link>
-        <button
+        </Button>
+        <Button
           onClick={() => window.history.back()}
-          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 font-medium"
+          variant="outlined"
+          size="large"
+          startIcon={<BackIcon />}
         >
           Go Back
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Stack>
+    </Box>
   );
 }

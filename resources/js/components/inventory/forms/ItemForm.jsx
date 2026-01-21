@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { TextField, Button, Box, Stack } from '@mui/material';
+import { Save as SaveIcon, Cancel as CancelIcon } from '@mui/icons-material';
 
 export default function ItemForm({ item = null, onSubmit, onCancel, isLoading = false }) {
   const [formData, setFormData] = useState({
@@ -70,68 +72,61 @@ export default function ItemForm({ item = null, onSubmit, onCancel, isLoading = 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-          Name <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
+    <Box component="form" onSubmit={handleSubmit} noValidate>
+      <Stack spacing={3}>
+        <TextField
+          fullWidth
           id="name"
           name="name"
+          label="Name"
           value={formData.name}
           onChange={handleChange}
-          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-            errors.name ? 'border-red-500' : 'border-gray-300'
-          }`}
+          error={!!errors.name}
+          helperText={errors.name}
           placeholder="Enter item name"
           disabled={isLoading}
+          required
         />
-        {errors.name && (
-          <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-        )}
-      </div>
 
-      <div>
-        <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
-          Quantity <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="number"
+        <TextField
+          fullWidth
           id="quantity"
           name="quantity"
+          label="Quantity"
+          type="number"
           value={formData.quantity}
           onChange={handleChange}
-          min="0"
-          step="1"
-          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-            errors.quantity ? 'border-red-500' : 'border-gray-300'
-          }`}
+          error={!!errors.quantity}
+          helperText={errors.quantity}
           placeholder="Enter quantity"
           disabled={isLoading}
+          required
+          inputProps={{
+            min: 0,
+            step: 1,
+          }}
         />
-        {errors.quantity && (
-          <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
-        )}
-      </div>
 
-      <div className="flex justify-end space-x-3 pt-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={isLoading}
-          className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoading ? 'Saving...' : item ? 'Update' : 'Create'}
-        </button>
-      </div>
-    </form>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, pt: 2 }}>
+          <Button
+            type="button"
+            onClick={onCancel}
+            disabled={isLoading}
+            variant="outlined"
+            startIcon={<CancelIcon />}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            variant="contained"
+            startIcon={<SaveIcon />}
+          >
+            {isLoading ? 'Saving...' : item ? 'Update' : 'Create'}
+          </Button>
+        </Box>
+      </Stack>
+    </Box>
   );
 }
