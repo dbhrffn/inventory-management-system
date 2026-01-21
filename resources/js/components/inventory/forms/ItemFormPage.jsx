@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Box, Paper, Typography, CircularProgress, Alert } from '@mui/material';
 import { createItem, updateItem, getItem, ApiError } from '../../../services/itemService.js';
 import ItemForm from './ItemForm.jsx';
 
@@ -73,39 +74,39 @@ export default function ItemFormPage() {
   // Show loading state while fetching item data
   if (isFetching) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      </div>
+      <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 12 }}>
+          <CircularProgress size={48} />
+        </Box>
+      </Box>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
+    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" component="h2" gutterBottom fontWeight="bold">
           {isEditMode ? 'Edit Item' : 'Create New Item'}
-        </h2>
-        <p className="text-gray-600 mt-1">
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
           {isEditMode ? 'Update the item details' : 'Add a new item to your inventory'}
-        </p>
-      </div>
+        </Typography>
+      </Box>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+        <Alert severity="error" sx={{ mb: 3 }}>
           {error}
-        </div>
+        </Alert>
       )}
 
-      <div className="bg-white shadow-md rounded-lg p-6">
+      <Paper elevation={2} sx={{ p: 4 }}>
         <ItemForm
           item={item}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isLoading={isLoading}
         />
-      </div>
-    </div>
+      </Paper>
+    </Box>
   );
 }

@@ -1,47 +1,49 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/material';
+import { Inventory as InventoryIcon, Add as AddIcon } from '@mui/icons-material';
 
 export default function Layout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation Header */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="flex justify-between items-center h-16">
-            <h1 className="text-xl font-bold text-gray-900">
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <AppBar position="static" color="default" elevation={1}>
+        <Container maxWidth="lg">
+          <Toolbar disableGutters>
+            <InventoryIcon sx={{ mr: 2 }} />
+            <Typography
+              variant="h6"
+              component="h1"
+              sx={{ flexGrow: 1, fontWeight: 'bold' }}
+            >
               Inventory Management System
-            </h1>
-            <div className="flex space-x-4">
-              <Link
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                component={Link}
                 to="/"
-                className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                  location.pathname === '/'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
+                variant={location.pathname === '/' ? 'contained' : 'text'}
+                color="primary"
               >
                 Inventory List
-              </Link>
-              <Link
+              </Button>
+              <Button
+                component={Link}
                 to="/add"
-                className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                  location.pathname === '/add'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
+                variant={location.pathname === '/add' ? 'contained' : 'text'}
+                color="primary"
+                startIcon={<AddIcon />}
               >
-                + Add Item
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+                Add Item
+              </Button>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
 
-      {/* Page Content */}
-      <main className="container mx-auto p-4 max-w-6xl">
+      <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
         <Outlet />
-      </main>
-    </div>
+      </Container>
+    </Box>
   );
 }

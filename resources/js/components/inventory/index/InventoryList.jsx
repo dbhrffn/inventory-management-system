@@ -1,5 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import {
+  Box,
+  Typography,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Button,
+  Alert,
+  CircularProgress,
+  Chip,
+  Stack,
+} from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import { getAllItems, deleteItem } from '../../../services/itemService.js';
 import DeleteModal from '../../shared/modals/DeleteModal.jsx';
 import { formatDate } from '../../../utils/dateFormatter.js';
@@ -93,127 +111,126 @@ export default function InventoryList() {
   };
 
   return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Inventory List</h2>
-        <p className="text-gray-600">View and manage your inventory items</p>
-      </div>
+    <Box>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" component="h2" gutterBottom fontWeight="bold">
+          Inventory List
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          View and manage your inventory items
+        </Typography>
+      </Box>
 
       {/* Messages */}
-      {(error || successMessage) && (
-        <div className="mb-4">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md flex justify-between items-center">
-              <span>{error}</span>
-              <button
-                onClick={clearMessages}
-                className="text-red-700 hover:text-red-900 text-xl font-bold"
-              >
-                ×
-              </button>
-            </div>
-          )}
-          {successMessage && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md flex justify-between items-center">
-              <span>{successMessage}</span>
-              <button
-                onClick={clearMessages}
-                className="text-green-700 hover:text-green-900 text-xl font-bold"
-              >
-                ×
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+      <Stack spacing={2} sx={{ mb: 3 }}>
+        {error && (
+          <Alert severity="error" onClose={clearMessages}>
+            {error}
+          </Alert>
+        )}
+        {successMessage && (
+          <Alert severity="success" onClose={clearMessages}>
+            {successMessage}
+          </Alert>
+        )}
+      </Stack>
 
       {/* Loading State */}
       {loading && (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 12 }}>
+          <CircularProgress size={48} />
+        </Box>
       )}
 
       {/* Empty State */}
       {!loading && items.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-gray-500 text-lg mb-2">No items found</p>
-          <p className="text-gray-400 text-sm mb-4">Get started by creating your first item</p>
-          <Link
+        <Paper
+          elevation={0}
+          sx={{
+            textAlign: 'center',
+            py: 12,
+            bgcolor: 'grey.50',
+            border: 1,
+            borderColor: 'grey.200',
+          }}
+        >
+          <Typography variant="h6" color="text.secondary" gutterBottom>
+            No items found
+          </Typography>
+          <Typography variant="body2" color="text.disabled" sx={{ mb: 3 }}>
+            Get started by creating your first item
+          </Typography>
+          <Button
+            component={Link}
             to="/add"
-            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            variant="contained"
+            startIcon={<AddIcon />}
           >
             Create First Item
-          </Link>
-        </div>
+          </Button>
+        </Paper>
       )}
 
       {/* Items Table */}
       {!loading && items.length > 0 && (
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Quantity
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {items.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      #{item.id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        <TableContainer component={Paper} elevation={2}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Quantity</TableCell>
+                <TableCell>Created</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {items.map((item) => (
+                <TableRow
+                  key={item.id}
+                  hover
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell>#{item.id}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2" fontWeight="medium">
                       {item.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {item.quantity}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(item.created_at)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <Link
-                          to={`/edit/${item.id}`}
-                          className="text-blue-600 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
-                          title="Edit"
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(item)}
-                          disabled={deleteLoading[item.id]}
-                          className="text-red-600 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-2 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Delete"
-                        >
-                          {deleteLoading[item.id] ? 'Deleting...' : 'Delete'}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={item.quantity}
+                      color="primary"
+                      size="small"
+                      variant="outlined"
+                    />
+                  </TableCell>
+                  <TableCell>{formatDate(item.created_at)}</TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      component={Link}
+                      to={`/edit/${item.id}`}
+                      color="primary"
+                      size="small"
+                      title="Edit"
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleDelete(item)}
+                      disabled={deleteLoading[item.id]}
+                      color="error"
+                      size="small"
+                      title="Delete"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
 
       {/* Delete Confirmation Modal */}
@@ -225,6 +242,6 @@ export default function InventoryList() {
         message={`Are you sure you want to delete "${itemToDelete?.name}"? This action cannot be undone.`}
         isLoading={deleteLoading[itemToDelete?.id]}
       />
-    </div>
+    </Box>
   );
 }
