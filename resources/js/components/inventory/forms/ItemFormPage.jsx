@@ -13,8 +13,12 @@ export default function ItemFormPage() {
   const [isFetching, setIsFetching] = useState(isEditMode);
   const [error, setError] = useState(null);
 
-  // Fetch item data if in edit mode
+  // Reset state when switching between add/edit modes or changing items
   useEffect(() => {
+    setError(null);
+    setItem(null);
+    setIsFetching(isEditMode);
+    
     if (isEditMode) {
       fetchItem();
     }
@@ -47,12 +51,12 @@ export default function ItemFormPage() {
       if (isEditMode) {
         await updateItem(id, formData);
         navigate('/', {
-          state: { message: 'Item updated successfully!' }
+          state: { message: 'Item updated successfully!', type: 'success' }
         });
       } else {
         await createItem(formData);
         navigate('/', {
-          state: { message: 'Item created successfully!' }
+          state: { message: 'Item created successfully!', type: 'success' }
         });
       }
     } catch (err) {

@@ -7,7 +7,7 @@ export default function NotFound({ message = 'Page not found', autoRedirect = fa
   useEffect(() => {
     if (autoRedirect) {
       const timer = setTimeout(() => {
-        navigate('/', { state: { message: 'Item not found' } });
+        navigate('/', { state: { message: 'Item not found', type: 'error' } });
       }, redirectDelay);
       return () => clearTimeout(timer);
     }

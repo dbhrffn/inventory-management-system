@@ -9,7 +9,7 @@ export default function InventoryList() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(location.state?.message || null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState({});
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -19,11 +19,26 @@ export default function InventoryList() {
   }, []);
 
   useEffect(() => {
-    // Clear the location state after reading the message
+    // Handle messages from navigation state
     if (location.state?.message) {
+      const { message, type } = location.state;
+      
+      // Set message based on type (default to success for backward compatibility)
+      if (type === 'error') {
+        setError(message);
+      } else {
+        setSuccessMessage(message);
+      }
+      
+      // Clear the location state after reading the message
       window.history.replaceState({}, document.title);
-      // Auto-hide success message after 5 seconds
-      const timer = setTimeout(() => setSuccessMessage(null), 5000);
+      
+      // Auto-hide message after 5 seconds
+      const timer = setTimeout(() => {
+        setError(null);
+        setSuccessMessage(null);
+      }, 5000);
+      
       return () => clearTimeout(timer);
     }
   }, [location.state]);
