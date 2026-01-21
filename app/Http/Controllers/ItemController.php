@@ -22,6 +22,9 @@ class ItemController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * 
+     * @param StoreItemRequest $request
+     * @return JsonResponse
      */
     public function store(StoreItemRequest $request): JsonResponse
     {
@@ -32,6 +35,9 @@ class ItemController extends Controller
 
     /**
      * Display the specified resource.
+     * 
+     * @param Item $item
+     * @return JsonResponse
      */
     public function show(Item $item): JsonResponse
     {
@@ -40,6 +46,10 @@ class ItemController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * 
+     * @param UpdateItemRequest $request
+     * @param Item $item
+     * @return JsonResponse
      */
     public function update(UpdateItemRequest $request, Item $item): JsonResponse
     {
@@ -50,6 +60,9 @@ class ItemController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * 
+     * @param Item $item
+     * @return Response
      */
     public function destroy(Item $item): Response
     {

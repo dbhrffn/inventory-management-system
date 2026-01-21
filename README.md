@@ -14,6 +14,10 @@ This Inventory Management System provides a comprehensive solution for tracking 
 - **Input Validation**: Comprehensive request validation for data integrity
 - **Error Handling**: Automatic ID validation with proper 404 responses for invalid or non-existent items
 - **Modern UI**: React-based frontend with Tailwind CSS
+- **Client-side Routing**: React Router for seamless navigation
+- **Modal Confirmations**: User-friendly delete confirmation modals
+- **Date Formatting**: Consistent date display with date-fns
+- **Responsive Design**: Mobile-friendly interface
 - **Real-time Updates**: Fast and responsive user interface
 
 ## Tech Stack
@@ -27,8 +31,10 @@ This Inventory Management System provides a comprehensive solution for tracking 
 
 ### Frontend
 - **React 19**: UI library
+- **React Router 7**: Client-side routing and navigation
 - **Tailwind CSS 4**: Utility-first CSS framework
-- **Vite**: Build tool and development server
+- **date-fns**: Modern date formatting and manipulation
+- **Vite 7**: Build tool and development server
 - **Axios**: HTTP client for API requests
 
 ## Requirements
@@ -113,6 +119,10 @@ Frontend (Vite):
 ```bash
 npm run dev
 ```
+
+The application will be available at:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000
 
 ### Development Scripts
 
@@ -240,6 +250,44 @@ Response: 422 Unprocessable Entity
 }
 ```
 
+## Frontend Features
+
+### Routing
+The application uses React Router for client-side navigation:
+- `/` - Inventory list (home page)
+- `/add` - Create new item form
+- `/edit/:id` - Edit existing item form
+- `/404` - Item not found page (with auto-redirect)
+- `*` - Page not found (catch-all route)
+
+### Components Architecture
+
+**Feature-based Organization**
+- `inventory/` - Item management components grouped by feature
+  - `forms/` - Item creation and editing forms
+  - `index/` - Inventory listing and table view
+
+**Shared Components**
+- `modals/` - Reusable modal dialogs (DeleteModal)
+- `pages/` - Common page components (NotFound)
+- `Layout.jsx` - App layout wrapper with navigation
+
+**Services Layer**
+- `itemService.js` - API client with centralized error handling
+  - Custom `ApiError` class for better error management
+  - Consistent HTTP methods (GET, POST, PUT, DELETE)
+
+**Utilities**
+- `dateFormatter.js` - Date formatting functions using date-fns
+
+### UI Features
+- **Responsive Design**: Mobile-friendly tables and forms
+- **Loading States**: Spinners and disabled states during API calls
+- **Success/Error Messages**: Dismissible alert notifications
+- **Delete Confirmation**: Modal dialog with item details
+- **Form Validation**: Client-side and server-side validation
+- **Keyboard Navigation**: ESC key to close modals
+
 ## Database Schema
 
 ### Items Table
@@ -248,6 +296,32 @@ Response: 422 Unprocessable Entity
 - `quantity` - Stock quantity (unsigned integer, minimum 0)
 - `created_at` - Timestamp
 - `updated_at` - Timestamp
+
+## Code Organization
+
+### Component Structure Philosophy
+
+The frontend follows industry best practices for React application structure:
+
+1. **Feature-based Organization**: Components are grouped by feature (`inventory/`) for better scalability
+2. **Separation of Concerns**: 
+   - Components handle UI rendering
+   - Services manage API communication
+   - Utils provide shared functionality
+3. **Reusability**: Shared components in `shared/` folder can be used across features
+4. **File Naming Conventions**:
+   - `.jsx` for React components (contains JSX)
+   - `.js` for pure JavaScript modules (utilities, services)
+   - Page components suffix with `Page` (e.g., `ItemFormPage.jsx`)
+
+### Best Practices Implemented
+
+- **Component Composition**: Small, focused components that do one thing well
+- **Error Boundaries**: Graceful error handling with user-friendly messages
+- **Loading States**: UI feedback during asynchronous operations
+- **Accessible UI**: Keyboard navigation and ARIA attributes
+- **Consistent Styling**: Tailwind CSS utilities for maintainable styles
+- **Date Formatting**: Centralized date formatting for consistency
 
 ## Security & Best Practices
 
@@ -291,9 +365,26 @@ inventory-management-system/
 │       └── 2026_01_20_003942_create_items_table.php
 ├── resources/
 │   ├── js/
-│   │   ├── app.jsx
-│   │   └── components/
+│   │   ├── app.jsx                    # Main app with routing
+│   │   ├── components/
+│   │   │   ├── inventory/             # Feature-specific components
+│   │   │   │   ├── forms/
+│   │   │   │   │   ├── ItemForm.jsx
+│   │   │   │   │   └── ItemFormPage.jsx
+│   │   │   │   └── index/
+│   │   │   │       └── InventoryList.jsx
+│   │   │   └── shared/                # Reusable components
+│   │   │       ├── modals/
+│   │   │       │   └── DeleteModal.jsx
+│   │   │       ├── pages/
+│   │   │       │   └── NotFound.jsx
+│   │   │       └── Layout.jsx
+│   │   ├── services/
+│   │   │   └── itemService.js         # API client
+│   │   └── utils/
+│   │       └── dateFormatter.js       # Date utilities
 │   └── views/
+│       └── app.blade.php
 ├── routes/
 │   ├── api.php
 │   └── web.php

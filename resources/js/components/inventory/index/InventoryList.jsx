@@ -1,20 +1,47 @@
 import { useState, useEffect } from 'react';
-import { getAllItems, createItem, updateItem, deleteItem } from '../services/itemService.js';
-import ItemForm from './ItemForm.jsx';
+import { Link, useLocation } from 'react-router-dom';
+import { getAllItems, deleteItem } from '../../../services/itemService.js';
+import DeleteModal from '../../shared/modals/DeleteModal.jsx';
+import { formatDate } from '../../../utils/dateFormatter.js';
 
-export default function Inventory() {
+export default function InventoryList() {
+  const location = useLocation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [formLoading, setFormLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState({});
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     fetchItems();
   }, []);
+
+  useEffect(() => {
+    // Handle messages from navigation state
+    if (location.state?.message) {
+      const { message, type } = location.state;
+      
+      // Set message based on type (default to success for backward compatibility)
+      if (type === 'error') {
+        setError(message);
+      } else {
+        setSuccessMessage(message);
+      }
+      
+      // Clear the location state after reading the message
+      window.history.replaceState({}, document.title);
+      
+      // Auto-hide message after 5 seconds
+      const timer = setTimeout(() => {
+        setError(null);
+        setSuccessMessage(null);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [location.state]);
 
   const fetchItems = async () => {
     try {
@@ -29,64 +56,34 @@ export default function Inventory() {
     }
   };
 
-  const handleCreate = () => {
-    setEditingItem(null);
-    setShowForm(true);
-    setError(null);
-    setSuccessMessage(null);
+  const handleDelete = (item) => {
+    setItemToDelete(item);
+    setDeleteModalOpen(true);
   };
 
-  const handleEdit = (item) => {
-    setEditingItem(item);
-    setShowForm(true);
-    setError(null);
-    setSuccessMessage(null);
-  };
-
-  const handleCancel = () => {
-    setShowForm(false);
-    setEditingItem(null);
-    setError(null);
-  };
-
-  const handleSubmit = async (formData) => {
-    try {
-      setFormLoading(true);
-      setError(null);
-
-      if (editingItem) {
-        await updateItem(editingItem.id, formData);
-        setSuccessMessage('Item updated successfully!');
-      } else {
-        await createItem(formData);
-        setSuccessMessage('Item created successfully!');
-      }
-
-      setShowForm(false);
-      setEditingItem(null);
-      await fetchItems();
-    } catch (err) {
-      setError(err.message || 'Failed to save item');
-    } finally {
-      setFormLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) {
-      return;
-    }
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
 
     try {
-      setDeleteLoading((prev) => ({ ...prev, [id]: true }));
+      setDeleteLoading((prev) => ({ ...prev, [itemToDelete.id]: true }));
       setError(null);
-      await deleteItem(id);
+      await deleteItem(itemToDelete.id);
       setSuccessMessage('Item deleted successfully!');
       await fetchItems();
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
     } catch (err) {
       setError(err.message || 'Failed to delete item');
+      setDeleteModalOpen(false);
     } finally {
-      setDeleteLoading((prev) => ({ ...prev, [id]: false }));
+      setDeleteLoading((prev) => ({ ...prev, [itemToDelete.id]: false }));
+    }
+  };
+
+  const closeDeleteModal = () => {
+    if (!deleteLoading[itemToDelete?.id]) {
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
     }
   };
 
@@ -96,10 +93,10 @@ export default function Inventory() {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-6xl">
+    <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Inventory Management System</h1>
-        <p className="text-gray-600">Manage your inventory items</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Inventory List</h2>
+        <p className="text-gray-600">View and manage your inventory items</p>
       </div>
 
       {/* Messages */}
@@ -110,7 +107,7 @@ export default function Inventory() {
               <span>{error}</span>
               <button
                 onClick={clearMessages}
-                className="text-red-700 hover:text-red-900"
+                className="text-red-700 hover:text-red-900 text-xl font-bold"
               >
                 ×
               </button>
@@ -121,7 +118,7 @@ export default function Inventory() {
               <span>{successMessage}</span>
               <button
                 onClick={clearMessages}
-                className="text-green-700 hover:text-green-900"
+                className="text-green-700 hover:text-green-900 text-xl font-bold"
               >
                 ×
               </button>
@@ -129,36 +126,6 @@ export default function Inventory() {
           )}
         </div>
       )}
-
-      {/* Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold mb-4 text-gray-900">
-              {editingItem ? 'Edit Item' : 'Create New Item'}
-            </h2>
-            <ItemForm
-              item={editingItem}
-              onSubmit={handleSubmit}
-              onCancel={handleCancel}
-              isLoading={formLoading}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="mb-4 flex justify-between items-center">
-        <div className="text-sm text-gray-600">
-          {loading ? 'Loading...' : `${items.length} item${items.length !== 1 ? 's' : ''}`}
-        </div>
-        <button
-          onClick={handleCreate}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
-        >
-          + Add New Item
-        </button>
-      </div>
 
       {/* Loading State */}
       {loading && (
@@ -172,12 +139,12 @@ export default function Inventory() {
         <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
           <p className="text-gray-500 text-lg mb-2">No items found</p>
           <p className="text-gray-400 text-sm mb-4">Get started by creating your first item</p>
-          <button
-            onClick={handleCreate}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          <Link
+            to="/add"
+            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             Create First Item
-          </button>
+          </Link>
         </div>
       )}
 
@@ -220,19 +187,19 @@ export default function Inventory() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(item.created_at).toLocaleDateString()}
+                      {formatDate(item.created_at)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => handleEdit(item)}
+                        <Link
+                          to={`/edit/${item.id}`}
                           className="text-blue-600 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
                           title="Edit"
                         >
                           Edit
-                        </button>
+                        </Link>
                         <button
-                          onClick={() => handleDelete(item.id)}
+                          onClick={() => handleDelete(item)}
                           disabled={deleteLoading[item.id]}
                           className="text-red-600 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-2 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Delete"
@@ -248,6 +215,16 @@ export default function Inventory() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={deleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        title="Delete Item"
+        message={`Are you sure you want to delete "${itemToDelete?.name}"? This action cannot be undone.`}
+        isLoading={deleteLoading[itemToDelete?.id]}
+      />
     </div>
   );
 }
